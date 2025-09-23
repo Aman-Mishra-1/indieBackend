@@ -1,3 +1,4 @@
+import path from "path";
 import express, { Application } from "express";
 import { env } from "process";
 import validateEnv from "./utils/validate.env";
@@ -49,6 +50,8 @@ class App {
 
     this.app.use(cookieParser());
     this.app.use(morganMiddleware);
+
+    this.app.use(express.static(path.join(__dirname, "../frontend/dist")));
   }
 
   private initializeDatabase(): void {
@@ -68,6 +71,10 @@ class App {
     this.app.use("/api/freelancer", freelancerRoutes);
     this.app.use("/api/media/", messageRoutes);
     this.app.use(errorHandler);
+
+    this.app.get("*", (req, res) => {
+      res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+    });
   }
 
   private initializeSocket(): void {
