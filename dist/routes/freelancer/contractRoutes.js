@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const FcontractRepository_1 = require("../../repository/freelancer/FcontractRepository");
+const FcontractService_1 = require("../../services/freelancer/FcontractService");
+const FcontractController_1 = require("../../controllers/freelancer/FcontractController");
+const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const router = express_1.default.Router();
+const contractRepository = new FcontractRepository_1.FreelancerContractRepository();
+const contractService = new FcontractService_1.FreelancerContractService(contractRepository);
+const contractController = new FcontractController_1.FreelancerContractController(contractService);
+router.post("/approve-contract/:contractId/:freelancerId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('freelancer'), contractController.approveContract.bind(contractController));
+router.get("/get-contracts/:freelancerId", contractController.getFreelancerContracts.bind(contractController));
+router.get("/view-contract/:contractId", contractController.viewContractDetails.bind(contractController));
+router.put("/update-status/:contractId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('freelancer'), contractController.updateContractStatus.bind(contractController));
+router.get("/completed-works/:freelancerId", contractController.getCompletedContracts.bind(contractController));
+exports.default = router;

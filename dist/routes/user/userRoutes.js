@@ -1,0 +1,28 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const userRepository_1 = require("../../repository/user/userRepository");
+const userService_1 = require("../../services/user/userService");
+const userController_1 = require("../../controllers/user/userController");
+const profileRepository_1 = require("../../repository/freelancer/profileRepository");
+const profileRepository_2 = require("../../repository/client/profileRepository");
+const router = express_1.default.Router();
+const userRepository = new userRepository_1.UserRepository();
+const fProfileRepository = new profileRepository_1.ProfileRepository();
+const cProfileReposiory = new profileRepository_2.CProfileRepository();
+const userService = new userService_1.UserService(userRepository, fProfileRepository, cProfileReposiory);
+const userController = new userController_1.UserController(userService);
+router.post("/register", userController.register.bind(userController));
+router.post("/verify-otp", userController.verifyOtp.bind(userController));
+router.post("/resend-otp", userController.resendOtp.bind(userController));
+router.post("/login", userController.login.bind(userController));
+router.post("/logout", userController.logout.bind(userController));
+router.post('/refresh-token', userController.refreshAccessToken.bind(userController));
+router.post('/google-login', userController.googleLogin.bind(userController));
+router.post("/reset-password", userController.resetPassword.bind(userController));
+router.post("/forgot-password", userController.forgotPassword.bind(userController));
+router.post("/update-new-password", userController.resetPasswordWithToken.bind(userController));
+exports.default = router;

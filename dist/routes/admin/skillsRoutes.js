@@ -1,0 +1,20 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const skillsRepository_1 = require("../../repository/admin/skillsRepository");
+const skillsService_1 = require("../../services/admin/skillsService");
+const skillsController_1 = require("../../controllers/admin/skillsController");
+const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const router = express_1.default.Router();
+const skillsRepository = new skillsRepository_1.SkillsRepository();
+const skillsService = new skillsService_1.SkillsService(skillsRepository);
+const skillsController = new skillsController_1.SKillsController(skillsService);
+router.post('/add-skills', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), skillsController.addSkills.bind(skillsController));
+router.put('/edit-skills/:id', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), skillsController.editSkills.bind(skillsController));
+router.get('/get-skills', skillsController.getSkills.bind(skillsController));
+router.put('/list-skills/:id', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), skillsController.listSkills.bind(skillsController));
+router.put('/unlist-skills/:id', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), skillsController.unlistSkills.bind(skillsController));
+exports.default = router;

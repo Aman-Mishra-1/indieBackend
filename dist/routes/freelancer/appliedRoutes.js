@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const applicationRepository_1 = require("../../repository/client/applicationRepository");
+const jobRepository_1 = require("../../repository/client/jobRepository");
+const applicationService_1 = require("../../services/client/applicationService");
+const applicationController_1 = require("../../controllers/client/applicationController");
+const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const router = express_1.default.Router();
+const applicationRepsitory = new applicationRepository_1.ApplicationRepository();
+const jobRepository = new jobRepository_1.JobRepository();
+const applicationService = new applicationService_1.ApplicationService(applicationRepsitory, jobRepository);
+const applicationController = new applicationController_1.ApplicationController(applicationService);
+router.post("/apply-job/:jobId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('freelancer'), applicationController.applyForJob.bind(applicationController));
+router.delete("/cancel-application/:applicationId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('freelancer'), applicationController.cancelApplication.bind(applicationController));
+router.get("/applied-jobs", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('freelancer'), applicationController.getFreelancerApplication.bind(applicationController));
+router.get("/applied-status/:jobId/:freelancerId", applicationController.getJobApplicationDetails.bind(applicationController));
+exports.default = router;

@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const jobRepository_1 = require("../../repository/client/jobRepository");
+const jobService_1 = require("../../services/client/jobService");
+const jobController_1 = require("../../controllers/client/jobController");
+const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const router = express_1.default.Router();
+const jobRepository = new jobRepository_1.JobRepository();
+const jobService = new jobService_1.JobService(jobRepository);
+const jobController = new jobController_1.JobController(jobService);
+router.get("/get-jobs", jobController.getJobs.bind(jobController));
+router.post("/create-job", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('client'), jobController.createJob.bind(jobController));
+router.get("/job-details/:id", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('client', 'freelancer'), jobController.getJobById.bind(jobController));
+router.get("/my-jobs/:id", jobController.getClientJobs.bind(jobController));
+router.put("/update-job/:id", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('client'), jobController.updateJob.bind(jobController));
+router.post("/payment/:jobId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('client'), jobController.stripePayment.bind(jobController));
+exports.default = router;

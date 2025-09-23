@@ -1,0 +1,21 @@
+"use strict";
+var __importDefault = (this && this.__importDefault) || function (mod) {
+    return (mod && mod.__esModule) ? mod : { "default": mod };
+};
+Object.defineProperty(exports, "__esModule", { value: true });
+const express_1 = __importDefault(require("express"));
+const authMiddleware_1 = require("../../middlewares/authMiddleware");
+const adminControllers_1 = require("../../controllers/admin/adminControllers");
+const adminRepository_1 = require("../../repository/admin/adminRepository");
+const adminService_1 = require("../../services/admin/adminService");
+const router = express_1.default.Router();
+const adminRepository = new adminRepository_1.AdminRepository();
+const adminService = new adminService_1.AdminService(adminRepository);
+const adminController = new adminControllers_1.AdminController(adminService);
+router.get('/get-clients', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), adminController.getClients.bind(adminController));
+router.get('/get-freelancers', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), adminController.getFreelancers.bind(adminController));
+router.put('/block-freelancer/:freelancerId', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), adminController.blockFreelancer.bind(adminController));
+router.put('/unblock-freelancer/:freelancerId', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), adminController.unblockFreelancer.bind(adminController));
+router.put('/block-client/:clientId', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), adminController.blockClient.bind(adminController));
+router.put('/unblock-client/:clientId', authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), adminController.unblockClient.bind(adminController));
+exports.default = router;
