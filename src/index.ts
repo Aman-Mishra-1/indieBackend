@@ -1,4 +1,3 @@
-import path from "path";
 import express, { Application } from "express";
 import { env } from "process";
 import validateEnv from "./utils/validate.env";
@@ -15,6 +14,7 @@ import { errorHandler } from "./middlewares/errorMiddleware";
 import { logger, morganMiddleware } from "./middlewares/loggerMiddleware";
 import http from "http";
 import { initSocket } from "./utils/socket";
+import path from "path";
 
 class App {
   public app: Application;
@@ -32,8 +32,8 @@ class App {
   }
 
   private initializeMiddlewares(): void {
+    // Required for Google login popups / window.postMessage
     this.app.use((req, res, next) => {
-      // Required for Google login popups / window.postMessage
       res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
       res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
       next();
@@ -51,6 +51,7 @@ class App {
     this.app.use(cookieParser());
     this.app.use(morganMiddleware);
 
+    // Serve frontend static files
     this.app.use(express.static(path.join(__dirname, "../frontend/dist")));
   }
 
@@ -59,6 +60,7 @@ class App {
   }
 
   private initializeRoutes(): void {
+    // API routes
     this.app.use(
       "/webhook",
       express.raw({ type: "application/json" }),
@@ -70,10 +72,13 @@ class App {
     this.app.use("/api/client", clientRoutes);
     this.app.use("/api/freelancer", freelancerRoutes);
     this.app.use("/api/media/", messageRoutes);
+
+    // Error handler for API
     this.app.use(errorHandler);
 
+    // Catch-all: serve index.html for SPA routing
     this.app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "../frontend/dist/index.html"));
+      res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
     });
   }
 
