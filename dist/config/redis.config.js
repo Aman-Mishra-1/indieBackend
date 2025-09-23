@@ -11,13 +11,10 @@ var __awaiter = (this && this.__awaiter) || function (thisArg, _arguments, P, ge
 Object.defineProperty(exports, "__esModule", { value: true });
 const redis_1 = require("redis");
 const redisClient = (0, redis_1.createClient)({
+    url: process.env.REDIS_URL || "redis://127.0.0.1:6379",
     socket: {
-        host: '127.0.0.1',
-        port: 6379,
-        reconnectStrategy: (retries) => {
-            return Math.min(retries * 50, 2000);
-        },
-    }
+        reconnectStrategy: (retries) => Math.min(retries * 50, 2000),
+    },
 });
 redisClient.on('error', (err) => console.error('Redis error:', err));
 (() => __awaiter(void 0, void 0, void 0, function* () {
