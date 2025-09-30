@@ -22,10 +22,11 @@ function generateContractId() {
     return `CON${randomDigits}`;
 }
 class ContractService {
-    constructor(_contractRepository, _jobRepository, _applicationRepository) {
+    constructor(_contractRepository, _jobRepository, _applicationRepository, _escrowService) {
         this._contractRepository = _contractRepository;
         this._jobRepository = _jobRepository;
         this._applicationRepository = _applicationRepository;
+        this._escrowService = _escrowService;
     }
     createContract(jobId, clientId, freelancerId, amount) {
         return __awaiter(this, void 0, void 0, function* () {
@@ -119,5 +120,18 @@ class ContractService {
         });
     }
     ;
+    completeContract(contractId) {
+        return __awaiter(this, void 0, void 0, function* () {
+            const contract = yield this._contractRepository.findById(contractId);
+            if (!contract) {
+                throw (0, httpError_1.createHttpError)(statusContstants_1.HttpStatus.NOT_FOUND, messageConstants_1.Messages.CONTRACT_NOT_FOUND);
+            }
+            // ✅ 1. Mark contract as completed
+            contract.status = "Completed";
+            yield contract.save();
+            // ✅ 2. Release funds automatically
+            yield this._escrowService.releaseToFreelancer(contractId);
+        });
+    }
 }
 exports.ContractService = ContractService;

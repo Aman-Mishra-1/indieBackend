@@ -19,7 +19,6 @@ const errorMiddleware_1 = require("./middlewares/errorMiddleware");
 const loggerMiddleware_1 = require("./middlewares/loggerMiddleware");
 const http_1 = __importDefault(require("http"));
 const socket_1 = require("./utils/socket");
-const path_1 = __importDefault(require("path"));
 class App {
     constructor() {
         (0, validate_env_1.default)();
@@ -31,53 +30,40 @@ class App {
         // this.initializeSocket()
     }
     initializeMiddlewares() {
-        // Required for Google login popups / window.postMessage
-        this.app.use((req, res, next) => {
-            res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-            res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-            next();
-        });
         this.app.use((0, cors_1.default)({
             origin: process_1.env.CLIENT_URL,
             methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
             allowedHeaders: ["Content-Type", "Authorization"],
-            credentials: true,
+            credentials: true
         }));
         this.app.use((0, cookie_parser_1.default)());
         this.app.use(loggerMiddleware_1.morganMiddleware);
-        // Serve frontend static files
-        this.app.use(express_1.default.static(path_1.default.join(__dirname, "../frontend/dist")));
     }
     initializeDatabase() {
         (0, db_config_1.default)();
     }
     initializeRoutes() {
-        // API routes
-        this.app.use("/webhook", express_1.default.raw({ type: "application/json" }), webhookRoutes_1.default);
+        this.app.use('/webhook', express_1.default.raw({ type: "application/json" }), webhookRoutes_1.default);
         this.app.use(express_1.default.json());
-        this.app.use("/api/auth", userRoutes_1.default);
-        this.app.use("/api/admin", adminRoute_1.default);
-        this.app.use("/api/client", clientRoutes_1.default);
-        this.app.use("/api/freelancer", freelancerRoutes_1.default);
-        this.app.use("/api/media/", messageRoutes_1.default);
-        // Error handler for API
+        this.app.use('/api/auth', userRoutes_1.default);
+        this.app.use('/api/admin', adminRoute_1.default);
+        this.app.use('/api/client', clientRoutes_1.default);
+        this.app.use('/api/freelancer', freelancerRoutes_1.default);
+        this.app.use('/api/media/', messageRoutes_1.default);
         this.app.use(errorMiddleware_1.errorHandler);
-        // Catch-all: serve index.html for SPA routing
-        this.app.get("*", (req, res) => {
-            res.sendFile(path_1.default.join(__dirname, "../frontend/dist", "index.html"));
-        });
     }
     initializeSocket() {
         (0, socket_1.initSocket)(this.server);
     }
     listen() {
         const PORT = Number(process.env.PORT) || 3000;
-        this.server.listen(Number(PORT), "0.0.0.0", () => {
+        this.server.listen(Number(PORT), '0.0.0.0', () => {
             loggerMiddleware_1.logger.info(`Server running on http://localhost:${PORT}`);
             console.log(`Server running on http://localhost:${PORT}`);
             this.initializeSocket();
         });
     }
 }
+;
 const app = new App();
 app.listen();

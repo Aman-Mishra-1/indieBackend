@@ -149,12 +149,7 @@ class EscrowService {
             }
             const paymentAmount = escrow.freelancerEarning * 0.5;
             // Add payment to freelancer wallet
-            // await this._walletRepository.addFunds(
-            //     freelancerId,
-            //     paymentAmount,
-            //     "Partial contract payment for canceled contract",
-            //     "credit"
-            // );
+            yield this._walletRepository.addFunds(freelancerId, paymentAmount, "Partial contract payment for canceled contract", "credit");
             const updatedEscrow = yield this._escrowRepository.findByIdAndUpdate(escrow._id.toString(), {
                 status: "released",
                 freelancerEarning: paymentAmount,

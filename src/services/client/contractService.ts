@@ -7,6 +7,8 @@ import { IContractService } from "../../interfaces/client/contract/IContractServ
 import { IJobRepository } from "../../interfaces/client/job/IJobRepository";
 import { IContract } from "../../models/client/contractModel";
 import { createHttpError } from "../../utils/httpError";
+import { IEscrowService } from "../../interfaces/admin/escrow/IEscrowService";
+
 
 function generateContractId(): string {
     const randomDigits = Math.floor(10000000 + Math.random() * 90000000);

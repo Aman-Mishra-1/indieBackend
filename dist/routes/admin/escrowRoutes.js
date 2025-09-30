@@ -21,5 +21,7 @@ router.get("/balance", authMiddleware_1.authenticateToken, (0, authMiddleware_1.
 router.put("/release-fund/:contractId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), escrowController.releaseFundsToFreelancer.bind(escrowController));
 router.put("/refund-client/:contractId/:clientId", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin', 'client'), escrowController.refundToClient.bind(escrowController));
 router.get("/transactions", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), escrowController.getAdminTransactions.bind(escrowController));
-router.get("/sales-report", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), escrowController.getAdminTransactions.bind(escrowController));
+router.get("/sales-report", authMiddleware_1.authenticateToken, (0, authMiddleware_1.authorizeRoles)('admin'), 
+// escrowController.getAdminTransactions.bind(escrowController
+escrowController.getSalesReport.bind(escrowController));
 exports.default = router;

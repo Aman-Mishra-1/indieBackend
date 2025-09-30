@@ -16,7 +16,6 @@ class ContractController {
     constructor(_contractService) {
         this._contractService = _contractService;
     }
-    ;
     createContract(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             var _a;
@@ -26,41 +25,49 @@ class ContractController {
                 const freelancerId = req.body.freelancerId;
                 const amount = req.body.amount;
                 if (!jobId || !clientId || !freelancerId || !amount) {
-                    res.status(statusContstants_1.HttpStatus.BAD_REQUEST).json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
+                    res
+                        .status(statusContstants_1.HttpStatus.BAD_REQUEST)
+                        .json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
                     return;
                 }
                 const contract = yield this._contractService.createContract(jobId, clientId, freelancerId, amount);
-                res.status(statusContstants_1.HttpStatus.CREATED).json({ message: messageConstants_1.Messages.CONTRACT_CREATE, contract });
+                res
+                    .status(statusContstants_1.HttpStatus.CREATED)
+                    .json({ message: messageConstants_1.Messages.CONTRACT_CREATE, contract });
             }
             catch (error) {
                 next(error);
             }
         });
     }
-    ;
     getClientContracts(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const clientId = req.params.clientId;
                 if (!clientId) {
-                    res.status(statusContstants_1.HttpStatus.BAD_REQUEST).json({ message: messageConstants_1.Messages.USER_NOT_FOUND });
+                    res
+                        .status(statusContstants_1.HttpStatus.BAD_REQUEST)
+                        .json({ message: messageConstants_1.Messages.USER_NOT_FOUND });
                     return;
                 }
                 const contracts = yield this._contractService.getClientContracts(clientId);
-                res.status(statusContstants_1.HttpStatus.OK).json({ count: contracts.length, data: contracts });
+                res
+                    .status(statusContstants_1.HttpStatus.OK)
+                    .json({ count: contracts.length, data: contracts });
             }
             catch (error) {
                 next(error);
             }
         });
     }
-    ;
     cancelContract(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { contractId } = req.params;
                 if (!contractId) {
-                    res.status(statusContstants_1.HttpStatus.BAD_REQUEST).json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
+                    res
+                        .status(statusContstants_1.HttpStatus.BAD_REQUEST)
+                        .json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
                     return;
                 }
                 yield this._contractService.cancelContract(contractId);
@@ -71,14 +78,15 @@ class ContractController {
             }
         });
     }
-    ;
     isContractExist(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const jobId = req.params.jobId;
                 const clientId = req.params.clientId;
                 if (!jobId || !clientId) {
-                    res.status(statusContstants_1.HttpStatus.BAD_REQUEST).json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
+                    res
+                        .status(statusContstants_1.HttpStatus.BAD_REQUEST)
+                        .json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
                     return;
                 }
                 const contract = yield this._contractService.isContractExist(jobId, clientId);
@@ -89,7 +97,6 @@ class ContractController {
             }
         });
     }
-    ;
     getAllContractsForAdmin(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
@@ -101,23 +108,45 @@ class ContractController {
             }
         });
     }
-    ;
     requestFundRelease(req, res, next) {
         return __awaiter(this, void 0, void 0, function* () {
             try {
                 const { contractId } = req.params;
                 if (!contractId) {
-                    res.status(statusContstants_1.HttpStatus.BAD_REQUEST).json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
+                    res
+                        .status(statusContstants_1.HttpStatus.BAD_REQUEST)
+                        .json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
                     return;
                 }
                 yield this._contractService.requestFundRelease(contractId);
-                res.status(statusContstants_1.HttpStatus.OK).json({ message: messageConstants_1.Messages.FUND_RELEASE_REQUEST });
+                res
+                    .status(statusContstants_1.HttpStatus.OK)
+                    .json({ message: messageConstants_1.Messages.FUND_RELEASE_REQUEST });
             }
             catch (error) {
                 next(error);
             }
         });
     }
-    ;
+    completeContract(req, res, next) {
+        return __awaiter(this, void 0, void 0, function* () {
+            try {
+                const { contractId } = req.params;
+                if (!contractId) {
+                    res
+                        .status(statusContstants_1.HttpStatus.BAD_REQUEST)
+                        .json({ message: messageConstants_1.Messages.MISSING_PARAMETERS });
+                    return;
+                }
+                yield this._contractService.completeContract(contractId);
+                res
+                    .status(statusContstants_1.HttpStatus.OK)
+                    .json({ message: "Contract completed and funds released" });
+            }
+            catch (error) {
+                next(error);
+            }
+        });
+    }
 }
 exports.ContractController = ContractController;
