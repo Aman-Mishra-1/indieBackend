@@ -62,5 +62,5 @@ const EscrowSchema: Schema = new Schema<IEscrow>(
     }
 );
 
-const Escrow = mongoose.model<IEscrow>("EscrowWallet", EscrowSchema);
+const Escrow = mongoose.model<IEscrow>("Escrow", EscrowSchema, "escrows");
 export default Escrow;
