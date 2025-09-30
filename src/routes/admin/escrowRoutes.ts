@@ -53,7 +53,8 @@ router.get(
     "/sales-report",
     authenticateToken,
     authorizeRoles('admin'),
-    escrowController.getAdminTransactions.bind(escrowController)
+    // escrowController.getAdminTransactions.bind(escrowController
+     escrowController.getSalesReport.bind(escrowController)
 );
 
 export default router;

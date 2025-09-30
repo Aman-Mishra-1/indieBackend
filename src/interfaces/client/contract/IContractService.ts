@@ -8,4 +8,6 @@ export interface IContractService {
     getAllContracts(): Promise<IContract[]>;
     requestFundRelease(contractId: string): Promise<boolean>;
     getContractById(contractId: string): Promise<IContract | null>;
+
+    completeContract(contractId: string): Promise<void>;
 };
