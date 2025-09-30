@@ -182,12 +182,12 @@ export class EscrowService implements IEscrowService {
         const paymentAmount = escrow.freelancerEarning * 0.5;
 
         // Add payment to freelancer wallet
-        // await this._walletRepository.addFunds(
-        //     freelancerId,
-        //     paymentAmount,
-        //     "Partial contract payment for canceled contract",
-        //     "credit"
-        // );
+        await this._walletRepository.addFunds(
+            freelancerId,
+            paymentAmount,
+            "Partial contract payment for canceled contract",
+            "credit"
+        );
 
         const updatedEscrow = await this._escrowRepository.findByIdAndUpdate(escrow._id!.toString(), {
             status: "released",

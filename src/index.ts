@@ -4,97 +4,72 @@ import validateEnv from "./utils/validate.env";
 import connectDB from "./config/db.config";
 import cors from "cors";
 import cookieParser from "cookie-parser";
-import routes from "./routes/user/userRoutes";
-import adminRoutes from "./routes/admin/adminRoute";
-import clientRoutes from "./routes/client/clientRoutes";
-import freelancerRoutes from "./routes/freelancer/freelancerRoutes";
-import webhookRoutes from "./routes/client/webhookRoutes";
-import messageRoutes from "./routes/user/messageRoutes";
+import routes from './routes/user/userRoutes';
+import adminRoutes from './routes/admin/adminRoute';
+import clientRoutes from './routes/client/clientRoutes';
+import freelancerRoutes from './routes/freelancer/freelancerRoutes';
+import webhookRoutes from './routes/client/webhookRoutes';
+import messageRoutes from './routes/user/messageRoutes';
 import { errorHandler } from "./middlewares/errorMiddleware";
 import { logger, morganMiddleware } from "./middlewares/loggerMiddleware";
-import http from "http";
-import { initSocket } from "./utils/socket";
-import path from "path";
+import http from 'http';
+import { initSocket } from './utils/socket';
 
 class App {
-  public app: Application;
-  public server: http.Server;
+    public app: Application;
+    public server: http.Server;
 
-  constructor() {
-    validateEnv();
-    this.app = express();
-    this.server = http.createServer(this.app);
+    constructor() {
+        validateEnv();
+        this.app = express();
+        this.server = http.createServer(this.app);
 
-    this.initializeMiddlewares();
-    this.initializeDatabase();
-    this.initializeRoutes();
-    // this.initializeSocket()
-  }
+        this.initializeMiddlewares()
+        this.initializeDatabase()
+        this.initializeRoutes()
+        // this.initializeSocket()
+    }
 
-  private initializeMiddlewares(): void {
-    // Required for Google login popups / window.postMessage
-    this.app.use((req, res, next) => {
-      res.setHeader("Cross-Origin-Opener-Policy", "same-origin-allow-popups");
-      res.setHeader("Cross-Origin-Embedder-Policy", "require-corp");
-      next();
-    });
+    private initializeMiddlewares(): void {
+        this.app.use(cors({ 
+            origin: env.CLIENT_URL,
+            methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
+            allowedHeaders: ["Content-Type", "Authorization"],
+            credentials: true
+        }));
+        
+        this.app.use(cookieParser());
+        this.app.use(morganMiddleware);
+    }
 
-    this.app.use(
-      cors({
-        origin: env.CLIENT_URL,
-        methods: ["GET", "POST", "PUT", "DELETE", "PATCH"],
-        allowedHeaders: ["Content-Type", "Authorization"],
-        credentials: true,
-      })
-    );
+    private initializeDatabase(): void{
+        connectDB()
+    }
 
-    this.app.use(cookieParser());
-    this.app.use(morganMiddleware);
+    private initializeRoutes(): void{
+        this.app.use('/webhook', express.raw({ type: "application/json" }), webhookRoutes);
+        this.app.use(express.json());
+        this.app.use('/api/auth', routes);
+        this.app.use('/api/admin', adminRoutes);
+        this.app.use('/api/client', clientRoutes);
+        this.app.use('/api/freelancer', freelancerRoutes);
+        this.app.use('/api/media/', messageRoutes);
+        this.app.use(errorHandler);
+    }
 
-    // Serve frontend static files
-    this.app.use(express.static(path.join(__dirname, "../frontend/dist")));
-  }
+    private initializeSocket(): void {
+        initSocket(this.server);
+    }
 
-  private initializeDatabase(): void {
-    connectDB();
-  }
+    public listen() {
+        const PORT = Number(process.env.PORT) || 3000
+        this.server.listen(Number(PORT), '0.0.0.0', () => {
+            logger.info(`Server running on http://localhost:${PORT}`);
+            console.log(`Server running on http://localhost:${PORT}`);
+            this.initializeSocket();
+        });
+    }
+};
 
-  private initializeRoutes(): void {
-    // API routes
-    this.app.use(
-      "/webhook",
-      express.raw({ type: "application/json" }),
-      webhookRoutes
-    );
-    this.app.use(express.json());
-    this.app.use("/api/auth", routes);
-    this.app.use("/api/admin", adminRoutes);
-    this.app.use("/api/client", clientRoutes);
-    this.app.use("/api/freelancer", freelancerRoutes);
-    this.app.use("/api/media/", messageRoutes);
-
-    // Error handler for API
-    this.app.use(errorHandler);
-
-    // Catch-all: serve index.html for SPA routing
-    this.app.get("*", (req, res) => {
-      res.sendFile(path.join(__dirname, "../frontend/dist", "index.html"));
-    });
-  }
-
-  private initializeSocket(): void {
-    initSocket(this.server);
-  }
-
-  public listen() {
-    const PORT = Number(process.env.PORT) || 3000;
-    this.server.listen(Number(PORT), "0.0.0.0", () => {
-      logger.info(`Server running on http://localhost:${PORT}`);
-      console.log(`Server running on http://localhost:${PORT}`);
-      this.initializeSocket();
-    });
-  }
-}
-
-const app = new App();
-app.listen();
+const app = new App()
+app.listen()
