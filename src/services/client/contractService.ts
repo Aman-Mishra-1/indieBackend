@@ -20,7 +20,7 @@ export class ContractService implements IContractService {
         private _contractRepository: IContractRepository,
         private _jobRepository: IJobRepository,
         private _applicationRepository: IApplicationRepository,
-        private _escrowService: IEscrowService
+        private _escrowService?: IEscrowService
     ) { }
     
     async createContract(jobId: string, clientId: string, freelancerId: string, amount: number): Promise<IContract> {
@@ -112,16 +112,19 @@ export class ContractService implements IContractService {
     
     async completeContract(contractId: string): Promise<void> {
     const contract = await this._contractRepository.findById(contractId);
-    if (!contract) {
-        throw createHttpError(HttpStatus.NOT_FOUND, Messages.CONTRACT_NOT_FOUND);
-    }
+    if (!contract) throw createHttpError(HttpStatus.NOT_FOUND, Messages.CONTRACT_NOT_FOUND);
 
-    // ✅ 1. Mark contract as completed
+    // mark contract completed
     contract.status = "Completed";
     await contract.save();
 
-    // ✅ 2. Release funds automatically
+    // release funds (if escrowService is provided)
+    if (!this._escrowService) {
+      // If you didn't inject it, throw or just return
+      throw createHttpError(HttpStatus.INTERNAL_SERVER_ERROR, "Escrow service not available");
+    }
+
     await this._escrowService.releaseToFreelancer(contractId);
-}
+  }
 
 }

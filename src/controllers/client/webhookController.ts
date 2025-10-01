@@ -93,7 +93,7 @@ export default class WebhookController {
             clientId: new mongoose.Types.ObjectId(clientId),
             freelancerId: new mongoose.Types.ObjectId(freelancerId),
             jobId: new mongoose.Types.ObjectId(jobId),
-            contractId: contract._id, // already ObjectId
+            contractId: contract._id, // contract._id is already ObjectId from findOneAndUpdate
             amount: paymentAmount,
             platformFee,
             freelancerEarning,
@@ -102,7 +102,6 @@ export default class WebhookController {
             createdAt: new Date(),
             updatedAt: new Date(),
           });
-
           console.log(
             `✅ Contract status updated to "Started" for job ${jobId}`
           );

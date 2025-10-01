@@ -18,21 +18,34 @@ export class WalletRepository
     type: "credit" | "debit",
     contractId?: string
   ): Promise<IWallet> {
+    console.log("=== [WalletRepository.addFunds] START ===");
+    console.log("Input params:", { userId, amount, description, type, contractId });
+
     let wallet = (await this.findOne({
       userId: new mongoose.Types.ObjectId(userId),
       isDeleted: false,
     })) as IWallet | null;
 
     if (!wallet) {
+      console.log("No wallet found for user. Creating new wallet...");
       wallet = (await this.create({
         userId: new mongoose.Types.ObjectId(userId),
         balance: 0,
         transactions: [],
       })) as IWallet;
+      console.log("New wallet created:", wallet._id.toString());
+    } else {
+      console.log("Existing wallet found:", {
+        walletId: wallet._id.toString(),
+        currentBalance: wallet.balance,
+        transactionsCount: wallet.transactions?.length || 0,
+      });
     }
 
     const newBalance =
       type === "credit" ? wallet.balance + amount : wallet.balance - amount;
+
+    console.log("Calculated new balance:", newBalance);
 
     const transaction = {
       amount,
@@ -44,7 +57,9 @@ export class WalletRepository
       }),
     };
 
-    return (await this.findByIdAndUpdate(
+    console.log("Appending transaction:", transaction);
+
+    const updated = (await this.findByIdAndUpdate(
       wallet._id.toString(),
       {
         $set: { balance: newBalance },
@@ -52,6 +67,16 @@ export class WalletRepository
       } as UpdateQuery<IWallet>,
       { new: true }
     )) as IWallet;
+
+    console.log("Updated wallet:", {
+      walletId: updated._id?.toString(),
+      newBalance: updated.balance,
+      transactionsCount: updated.transactions?.length || 0,
+    });
+
+    console.log("=== [WalletRepository.addFunds] END ===");
+
+    return updated;
   }
 
   async getUserTransactions(walletId: string): Promise<any[]> {

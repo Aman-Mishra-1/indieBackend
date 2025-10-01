@@ -167,7 +167,6 @@ export class ContractController implements IContractController {
       }
 
       await this._contractService.completeContract(contractId);
-
       res
         .status(HttpStatus.OK)
         .json({ message: "Contract completed and funds released" });
