@@ -39,5 +39,8 @@ export const env = {
     },
     get STRIPE_WEBHOOK_SECRET() {
         return process.env.STRIPE_WEBHOOK_SECRET
+    },
+    get RESEND_API_KEY() {
+        return process.env.RESEND_API_KEY
     }
 };

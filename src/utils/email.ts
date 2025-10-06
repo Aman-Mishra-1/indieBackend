@@ -11,16 +11,19 @@ export const sendEmail = async (
 ): Promise<void> => {
   try {
     const data = await resend.emails.send({
-      from: 'IndieConnect <noreply@indieconnect.dev>', // You can customize this
+      from: 'IndieConnect <noreply@indieconnect.dev>',
       to,
       subject,
-      text,
       html,
+      text,
     });
 
-    console.log('✅ Email sent successfully:', data.id);
+    if (data.error) {
+      console.error('❌ Email send failed:', data.error.message);
+    } else {
+      console.log('✅ Email sent successfully:', data.data?.id);
+    }
   } catch (error: any) {
     console.error('❌ Error sending email:', error.message);
-    console.error('Full error:', error);
   }
 };
