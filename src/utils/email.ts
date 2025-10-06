@@ -9,14 +9,17 @@ export const sendEmail = async (
   text: string,
   html?: string
 ): Promise<void> => {
+  console.log(`[DEBUG] Attempting to send email via Resend to: ${to}`);
   try {
     const data = await resend.emails.send({
-      from: 'IndieConnect <noreply@indieconnect.dev>',
+      from: 'IndieConnect <onboarding@resend.dev>', // ✅ works without domain verification
       to,
       subject,
       html,
       text,
     });
+
+    console.log('[DEBUG] Resend response:', data);
 
     if (data.error) {
       console.error('❌ Email send failed:', data.error.message);
@@ -24,6 +27,7 @@ export const sendEmail = async (
       console.log('✅ Email sent successfully:', data.data?.id);
     }
   } catch (error: any) {
-    console.error('❌ Error sending email:', error.message);
+    console.error('❌ Exception in sendEmail:', error.message);
+    console.error(error);
   }
 };
