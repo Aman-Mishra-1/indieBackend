@@ -9,7 +9,7 @@ export const generateOtp = (): string => {
 export const sendOtp = async (email: string, otp: string): Promise<void> => {
     const htmlContent = `
         <div style="max-width: 500px; margin: auto; font-family: Arial, sans-serif; border: 1px solid #ddd; padding: 20px; border-radius: 8px; box-shadow: 2px 2px 10px rgba(0,0,0,0.1);">
-            <h2 style="color: #007bff; text-align: center;">Welcome to Skillora!</h2>
+            <h2 style="color: #007bff; text-align: center;">Welcome to IndieConnect!</h2>
             <p style="font-size: 16px; color: #555; text-align: center;">Use the OTP below to verify your email and complete your registration.</p>
             <div style="text-align: center; margin: 20px 0;">
                 <span style="display: inline-block; font-size: 24px; font-weight: bold; background: #f4f4f4; padding: 10px 20px; border-radius: 5px; color: #333;">
